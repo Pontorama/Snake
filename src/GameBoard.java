@@ -5,12 +5,15 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Random;
 
 public class GameBoard extends JPanel {
 
     private boolean inGame = false;
     private String message = "";
     private Snake snek;
+    private Fruit fruit;
+    private int points;
 
     public GameBoard(){
         InitBoard();
@@ -25,10 +28,11 @@ public class GameBoard extends JPanel {
 
     public void gameInit(){
         snek = new Snake();
-
+        spawnFruit();
         Timer timer = new Timer(Commons.TICKTIME, new GameCycle());
         timer.start();
         this.inGame = true;
+        this.points = 0;
     }
 
     private class GameCycle implements ActionListener {
@@ -40,6 +44,7 @@ public class GameBoard extends JPanel {
 
     private void doGameCycle(){
         this.snek.move();
+        this.checkCollisions();
         repaint();
     }
     @Override
@@ -67,6 +72,42 @@ public class GameBoard extends JPanel {
             Bodypart b = body.get(i);
             g2d.drawImage(b.getImage(), b.getX()*Commons.CELLSIZE, b.getY()*Commons.CELLSIZE, b.getImageWidth(), b.getImageHeight(), null);
         }
+
+        g2d.drawImage(this.fruit.getImage(), this.fruit.getX()*Commons.CELLSIZE, this.fruit.getY()*Commons.CELLSIZE, this.fruit.getImageWidth(), this.fruit.getImageHeight(), null);
+    }
+    private void checkCollisions(){
+        if(this.snek.getBody().get(0).getX() == this.fruit.getX() && this.snek.getBody().get(0).getY() == this.fruit.getY()){
+            this.fruit = null;
+            this.points++;
+            this.snek.eat();
+            spawnFruit();
+        }
+    }
+
+    private void spawnFruit(){
+        Random r = new Random();
+        int fx = (int)(r.nextDouble() * Commons.TILEWIDTH);
+        int fy = (int)(r.nextDouble() * Commons.TILEHEIGHT);
+
+        while(true){
+            boolean forbidden = false;
+            for(int i = 0; i < this.snek.getBodyLength(); i++){
+                if(fx == snek.getBody().get(i).getX() && fy == snek.getBody().get(i).getY()){
+                    forbidden = true;
+                }
+
+            }
+            if(fx > Commons.TILEWIDTH || fx < 0 || fy > Commons.TILEHEIGHT || fy < 0){
+                forbidden = true;
+            }
+            if(!forbidden){
+                break;
+            }
+            fx = r.nextInt();
+            fy = r.nextInt();
+        }
+
+        this.fruit = new Fruit(fx,fy);
     }
 
     private void gameFinished(Graphics2D g2d){
@@ -92,4 +133,5 @@ public class GameBoard extends JPanel {
         public void keyReleased(KeyEvent e){
         }
     }
+
 }

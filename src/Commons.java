@@ -6,7 +6,7 @@ public interface Commons {
     int TILEWIDTH = Commons.WIDTH/Commons.CELLSIZE;
     int TILEHEIGHT = Commons.HEIGHT/Commons.CELLSIZE;
     int CELLSIZE = 20;
-    int TICKTIME = 1000;
+    int TICKTIME = 400;
     int INITIALLENGTH = 3;
     Color SNAKECOLOR = Color.green;
     Color FRUITCOLOR = Color.red;
